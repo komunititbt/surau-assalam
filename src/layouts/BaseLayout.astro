@@ -39,7 +39,7 @@ const metaDesc = description || settings.about_short || "";
 <body>
   <header class="site-header">
     <div class="header-inner">
-      <a href="/" class="brand">
+      <a href={import.meta.env.BASE_URL} class="brand">
         {settings.logo_url
           ? <img src={settings.logo_url} alt={`Logo ${siteName}`} />
           : <img src="/favicon.svg" alt={`Logo ${siteName}`} />}
@@ -55,7 +55,7 @@ const metaDesc = description || settings.about_short || "";
       <nav class="site-nav">
         {menu.map(m => (
           <a
-            href={m.href}
+            href={`${import.meta.env.BASE_URL}${m.href.replace(/^\//, '')}`}
             class={current === (m.href.replace(/\/$/, "") || "/") ? "active" : ""}
           >{m.label}</a>
         ))}

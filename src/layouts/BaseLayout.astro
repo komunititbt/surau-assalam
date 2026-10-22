@@ -36,8 +36,8 @@ const metaDesc = description || settings.about_short || "";
   <title>{pageTitle}</title>
   <meta name="description" content={metaDesc} />
   <!-- Tambah base pada favicon dan css -->
-  <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
-  <link rel="stylesheet" href={`${base}styles.css`} />
+  <link rel="icon" type="image/svg+xml" href="/surau-assalam/favicon.svg" />
+  <link rel="stylesheet" href="/surau-assalam/styles.css" />
 </head>
 <body>
   <header class="site-header">
@@ -59,7 +59,7 @@ const metaDesc = description || settings.about_short || "";
       <nav class="site-nav">
         {menu.map(m => (
           <a
-            href={m.href === "/" ? base : `${base}${m.href.replace(/^\//, '')}`}
+            href={m.href === "/" ? "/surau-assalam/" : `/surau-assalam${m.href}`}
             class={current === (m.href.replace(/\/$/, "") || "/") ? "active" : ""}
           >{m.label}</a>
         ))}

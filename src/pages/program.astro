@@ -1,0 +1,49 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getAllPrograms } from "../lib/sheets";
+
+const today = new Date().toISOString().slice(0, 10);
+const programs = await getAllPrograms();
+const upcoming = programs.filter(p => (p.date ?? "") >= today);
+const past = programs.filter(p => (p.date ?? "") < today).reverse();
+---
+<BaseLayout title="Program & Aktiviti">
+  <h1>Program &amp; Aktiviti</h1>
+
+  <section class="section">
+    <h2>Akan Datang</h2>
+    {upcoming.length === 0 ? (
+      <div class="empty-state">Tiada program akan datang.</div>
+    ) : (
+      <div class="card-list grid-2">
+        {upcoming.map(p => (
+          <article class="card">
+            <div class="meta">
+              <span>📅 {p.date}</span>
+              <span>🕐 {p.time}{p.end_time ? `–${p.end_time}` : ""}</span>
+            </div>
+            <h3>{p.title}</h3>
+            <p>📍 {p.location}</p>
+            {p.speaker && <p><strong>Penceramah:</strong> {p.speaker}</p>}
+            {p.description && <p>{p.description}</p>}
+          </article>
+        ))}
+      </div>
+    )}
+  </section>
+
+  {past.length > 0 && (
+    <section class="section">
+      <h2>Program Lepas</h2>
+      <div class="card-list grid-2">
+        {past.map(p => (
+          <article class="card">
+            <div class="meta"><span>📅 {p.date}</span></div>
+            <h3>{p.title}</h3>
+            <p>📍 {p.location}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+</BaseLayout>

@@ -1,0 +1,25 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getGallery } from "../lib/sheets";
+
+const gallery = await getGallery();
+---
+<BaseLayout title="Galeri">
+  <h1>Galeri</h1>
+  {gallery.length === 0 ? (
+    <div class="empty-state">Galeri belum tersedia.</div>
+  ) : (
+    <div class="gallery-grid">
+      {gallery.map(g => (
+        <div class="gallery-item">
+          {g.image_url && <img src={g.image_url} alt={g.title} loading="lazy" />}
+          <div class="caption">
+            <h3>{g.title}</h3>
+            {g.event_date && <p>📅 {g.event_date}</p>}
+            {g.description && <p>{g.description}</p>}
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</BaseLayout>

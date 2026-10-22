@@ -1,0 +1,29 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getAnnouncements } from "../lib/sheets";
+
+const announcements = await getAnnouncements();
+---
+<BaseLayout title="Pengumuman" description="Pengumuman terkini Surau">
+  <h1>Pengumuman</h1>
+  {announcements.length === 0 ? (
+    <div class="empty-state">Tiada pengumuman buat masa ini.</div>
+  ) : (
+    <div class="card-list">
+      {announcements.map(a => {
+        const pinned = (a.is_pinned ?? "").toLowerCase() === "yes";
+        return (
+          <article class={`card ${pinned ? "pinned" : ""}`}>
+            <div class="meta">
+              <span>📅 {a.date}</span>
+              <span>🏷️ {a.category}</span>
+              {pinned && <span class="badge">Disematkan</span>}
+            </div>
+            <h3>{a.title}</h3>
+            <p>{a.content}</p>
+          </article>
+        );
+      })}
+    </div>
+  )}
+</BaseLayout>

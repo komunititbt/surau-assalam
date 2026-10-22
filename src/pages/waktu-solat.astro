@@ -1,0 +1,68 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getMonthPrayerFromSheet } from "../lib/sheets";
+import { getJakimMonth } from "../lib/prayer";
+import type { PrayerToday } from "../lib/types";
+
+// Cuba sheet dulu (boleh simpan berbulan-bulan), fallback JAKIM (bulan ini)
+let prayers: PrayerToday[] = (await getMonthPrayerFromSheet()).map(p => ({
+  date: p.date,
+  fajr: p.fajr,
+  dhuhr: p.dhuhr,
+  asr: p.asr,
+  maghrib: p.maghrib,
+  isha: p.isha,
+  source: "Sheet",
+}));
+
+if (prayers.length === 0) {
+  prayers = await getJakimMonth();
+}
+
+const todayKL = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Kuala_Lumpur",
+  year: "numeric", month: "2-digit", day: "2-digit",
+}).format(new Date());
+
+const monthName = prayers[0]
+  ? new Date(prayers[0].date).toLocaleDateString("ms-MY", { month: "long", year: "numeric" })
+  : "";
+---
+<BaseLayout title="Waktu Solat">
+  <h1>Waktu Solat {monthName && `— ${monthName}`}</h1>
+  {prayers.length === 0 ? (
+    <div class="empty-state">Data waktu solat belum tersedia. Sila isi sheet <code>PrayerTimes</code> atau semak sambungan API JAKIM.</div>
+  ) : (
+    <>
+      <div class="table-wrap">
+        <table class="prayer-table">
+          <thead>
+            <tr>
+              <th>Tarikh</th>
+              <th>Subuh</th>
+              <th>Zohor</th>
+              <th>Asar</th>
+              <th>Maghrib</th>
+              <th>Isyak</th>
+            </tr>
+          </thead>
+          <tbody>
+            {prayers.map(p => (
+              <tr class={p.date === todayKL ? "today" : ""}>
+                <td>{p.date}</td>
+                <td>{p.fajr}</td>
+                <td>{p.dhuhr}</td>
+                <td>{p.asr}</td>
+                <td>{p.maghrib}</td>
+                <td>{p.isha}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="prayer-source" style="margin-top:1rem">
+        Sumber: {prayers[0].source} · Tarikh disemak: {new Date().toLocaleDateString("ms-MY", { timeZone: "Asia/Kuala_Lumpur" })}
+      </p>
+    </>
+  )}
+</BaseLayout>

@@ -1,0 +1,24 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCommittee } from "../lib/sheets";
+
+const committee = await getCommittee();
+---
+<BaseLayout title="Ahli Jawatankuasa">
+  <h1>Ahli Jawatankuasa</h1>
+  {committee.length === 0 ? (
+    <div class="empty-state">Senarai AJK belum disediakan.</div>
+  ) : (
+    <div class="committee-grid">
+      {committee.map(c => (
+        <div class="committee-card">
+          {c.photo_url
+            ? <img src={c.photo_url} alt={c.name} />
+            : <div class="placeholder-avatar">{(c.name || "?").charAt(0).toUpperCase()}</div>}
+          <h3>{c.name}</h3>
+          <p>{c.position}</p>
+        </div>
+      ))}
+    </div>
+  )}
+</BaseLayout>

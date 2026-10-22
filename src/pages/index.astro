@@ -1,11 +1,109 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import {
+  getSettings, getAnnouncements, getUpcomingPrograms,
+  getTodayPrayerFromSheet,
+} from "../lib/sheets";
+import { getJakimToday } from "../lib/prayer";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const settings = await getSettings();
+const announcements = (await getAnnouncements()).slice(0, 3);
+const programs = (await getUpcomingPrograms()).slice(0, 3);
+
+// Cuba JAKIM dulu, fallback ke sheet
+let prayer = await getJakimToday();
+let prayerSource = "JAKIM";
+
+if (!prayer) {
+  const sheetPrayer = await getTodayPrayerFromSheet();
+  if (sheetPrayer) {
+    prayer = {
+      date: sheetPrayer.date,
+      fajr: sheetPrayer.fajr,
+      dhuhr: sheetPrayer.dhuhr,
+      asr: sheetPrayer.asr,
+      maghrib: sheetPrayer.maghrib,
+      isha: sheetPrayer.isha,
+      source: "Sheet",
+    };
+    prayerSource = "Sheet";
+  }
+}
 ---
+<BaseLayout>
+  <section class="hero">
+    <h1>{settings.site_name}</h1>
+    {settings.tagline && <p>"{settings.tagline}"</p>}
+  </section>
 
-<Layout>
-	<Welcome />
-</Layout>
+  {prayer ? (
+    <section class="prayer-card">
+      <h2>Waktu Solat Hari Ini</h2>
+      <ul class="prayer-times">
+        <li><span class="prayer-name">Subuh</span><span class="prayer-time">{prayer.fajr}</span></li>
+        <li><span class="prayer-name">Zohor</span><span class="prayer-time">{prayer.dhuhr}</span></li>
+        <li><span class="prayer-name">Asar</span><span class="prayer-time">{prayer.asr}</span></li>
+        <li><span class="prayer-name">Maghrib</span><span class="prayer-time">{prayer.maghrib}</span></li>
+        <li><span class="prayer-name">Isyak</span><span class="prayer-time">{prayer.isha}</span></li>
+      </ul>
+      <p class="prayer-source">Sumber: {prayer.source} · <a href="/waktu-solat">Lihat bulan ini →</a></p>
+    </section>
+  ) : (
+    <section class="prayer-card">
+      <h2>Waktu Solat Hari Ini</h2>
+      <p class="text-center" style="color:var(--muted)">Data waktu solat belum tersedia.</p>
+    </section>
+  )}
+
+  <section class="section">
+    <div class="section-header">
+      <h2>Pengumuman Terkini</h2>
+      {announcements.length > 0 && <a href="/pengumuman">Lihat semua →</a>}
+    </div>
+    {announcements.length === 0 ? (
+      <div class="empty-state">Tiada pengumuman buat masa ini.</div>
+    ) : (
+      <div class="card-list">
+        {announcements.map(a => {
+          const pinned = (a.is_pinned ?? "").toLowerCase() === "yes";
+          return (
+            <article class={`card ${pinned ? "pinned" : ""}`}>
+              <div class="meta">
+                <span>📅 {a.date}</span>
+                <span>🏷️ {a.category}</span>
+                {pinned && <span class="badge">Disematkan</span>}
+              </div>
+              <h3>{a.title}</h3>
+              <p>{a.content}</p>
+            </article>
+          );
+        })}
+      </div>
+    )}
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <h2>Program Akan Datang</h2>
+      {programs.length > 0 && <a href="/program">Lihat semua →</a>}
+    </div>
+    {programs.length === 0 ? (
+      <div class="empty-state">Tiada program akan datang.</div>
+    ) : (
+      <div class="card-list grid-2">
+        {programs.map(p => (
+          <article class="card">
+            <div class="meta">
+              <span>📅 {p.date}</span>
+              <span>🕐 {p.time}{p.end_time ? `–${p.end_time}` : ""}</span>
+            </div>
+            <h3>{p.title}</h3>
+            <p>📍 {p.location}</p>
+            {p.speaker && <p><strong>Penceramah:</strong> {p.speaker}</p>}
+            {p.description && <p>{p.description}</p>}
+          </article>
+        ))}
+      </div>
+    )}
+  </section>
+</BaseLayout>

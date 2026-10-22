@@ -8,6 +8,7 @@ interface Props {
 
 const { title, description } = Astro.props;
 const settings = await getSettings();
+const base = import.meta.env.BASE_URL;
 
 const menu = [
   { href: "/", label: "Utama" },
@@ -21,7 +22,8 @@ const menu = [
   { href: "/waktu-solat", label: "Waktu Solat" },
 ];
 
-const current = Astro.url.pathname.replace(/\/$/, "") || "/";
+// Membuang base path untuk semakan menu aktif
+const current = Astro.url.pathname.replace(base, "/").replace(/\/$/, "") || "/";
 const siteName = settings.site_name || "Surau";
 const pageTitle = title ? `${title} — ${siteName}` : `${siteName} — ${settings.location_name ?? ""}`;
 const metaDesc = description || settings.about_short || "";
@@ -33,16 +35,18 @@ const metaDesc = description || settings.about_short || "";
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{pageTitle}</title>
   <meta name="description" content={metaDesc} />
-  <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
-  <link rel="stylesheet" href={`${import.meta.env.BASE_URL}styles.css`} />
+  <!-- Tambah base pada favicon dan css -->
+  <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+  <link rel="stylesheet" href={`${base}styles.css`} />
 </head>
 <body>
   <header class="site-header">
     <div class="header-inner">
-      <a href={import.meta.env.BASE_URL} class="brand">
+      <!-- Tambah base pada link logo utama -->
+      <a href={base} class="brand">
         {settings.logo_url
           ? <img src={settings.logo_url} alt={`Logo ${siteName}`} />
-          : <img src="/favicon.svg" alt={`Logo ${siteName}`} />}
+          : <img src={`${base}favicon.svg`} alt={`Logo ${siteName}`} />}
         <div class="brand-text">
           <span class="brand-name">{siteName}</span>
           {settings.location_name && <span class="brand-loc">{settings.location_name}</span>}
@@ -55,7 +59,7 @@ const metaDesc = description || settings.about_short || "";
       <nav class="site-nav">
         {menu.map(m => (
           <a
-            href={`${import.meta.env.BASE_URL}${m.href.replace(/^\//, '')}`}
+            href={m.href === "/" ? base : `${base}${m.href.replace(/^\//, '')}`}
             class={current === (m.href.replace(/\/$/, "") || "/") ? "active" : ""}
           >{m.label}</a>
         ))}

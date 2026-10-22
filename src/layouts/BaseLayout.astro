@@ -43,10 +43,10 @@ const metaDesc = description || settings.about_short || "";
   <header class="site-header">
     <div class="header-inner">
       <!-- Tambah base pada link logo utama -->
-      <a href={base} class="brand">
+      <a href="/surau-assalam/" class="brand">
         {settings.logo_url
           ? <img src={settings.logo_url} alt={`Logo ${siteName}`} />
-          : <img src={`${base}favicon.svg`} alt={`Logo ${siteName}`} />}
+          : <img src="/surau-assalam/favicon.svg" alt={`Logo ${siteName}`} />}
         <div class="brand-text">
           <span class="brand-name">{siteName}</span>
           {settings.location_name && <span class="brand-loc">{settings.location_name}</span>}

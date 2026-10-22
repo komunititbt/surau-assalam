@@ -2,9 +2,9 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   schedule:
-    - cron: "0 16 * * *"   # 00:00 MYT (16:00 UTC) — rebuild harian
+    - cron: "0 16 * * *"
   workflow_dispatch:
 
 permissions:
@@ -13,8 +13,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   build:

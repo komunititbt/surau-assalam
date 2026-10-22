@@ -6,11 +6,11 @@ import {
 } from "../lib/sheets";
 import { getJakimToday } from "../lib/prayer";
 
+const base = import.meta.env.BASE_URL;
 const settings = await getSettings();
 const announcements = (await getAnnouncements()).slice(0, 3);
 const programs = (await getUpcomingPrograms()).slice(0, 3);
 
-// Cuba JAKIM dulu, fallback ke sheet
 let prayer = await getJakimToday();
 let prayerSource = "JAKIM";
 
@@ -46,7 +46,7 @@ if (!prayer) {
         <li><span class="prayer-name">Maghrib</span><span class="prayer-time">{prayer.maghrib}</span></li>
         <li><span class="prayer-name">Isyak</span><span class="prayer-time">{prayer.isha}</span></li>
       </ul>
-      <p class="prayer-source">Sumber: {prayer.source} · <a href="/waktu-solat">Lihat bulan ini →</a></p>
+      <p class="prayer-source">Sumber: {prayer.source} · <a href={`${base}waktu-solat`}>Lihat bulan ini →</a></p>
     </section>
   ) : (
     <section class="prayer-card">
@@ -58,7 +58,7 @@ if (!prayer) {
   <section class="section">
     <div class="section-header">
       <h2>Pengumuman Terkini</h2>
-      {announcements.length > 0 && <a href="/pengumuman">Lihat semua →</a>}
+      {announcements.length > 0 && <a href={`${base}pengumuman`}>Lihat semua →</a>}
     </div>
     {announcements.length === 0 ? (
       <div class="empty-state">Tiada pengumuman buat masa ini.</div>
@@ -85,7 +85,7 @@ if (!prayer) {
   <section class="section">
     <div class="section-header">
       <h2>Program Akan Datang</h2>
-      {programs.length > 0 && <a href="/program">Lihat semua →</a>}
+      {programs.length > 0 && <a href={`${base}program`}>Lihat semua →</a>}
     </div>
     {programs.length === 0 ? (
       <div class="empty-state">Tiada program akan datang.</div>
